@@ -1,0 +1,5 @@
+{
+  "name": "MonoMark",
+  "description": "A minimal, dual-color Markdown editor with split-view, real-time preview, and dark mode support focused on distraction-free writing.",
+  "requestFramePermissions": []
+}
