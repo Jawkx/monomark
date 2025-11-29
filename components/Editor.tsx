@@ -5,8 +5,6 @@ import { EditorProps } from '../types';
 const Editor: React.FC<EditorProps> = ({ content, onChange, visible, contentWidth, baseSize }) => {
   const textareaRef = useRef<HTMLTextAreaElement>(null);
 
-  if (!visible) return null;
-
   // Calculate max-width based on slider value (0-100)
   const getMaxWidth = () => {
     if (contentWidth >= 100) return '100%';
@@ -24,7 +22,7 @@ const Editor: React.FC<EditorProps> = ({ content, onChange, visible, contentWidt
 
   return (
     <div 
-        className="h-full w-full relative group cursor-text overflow-y-auto" 
+        className={`h-full w-full relative group cursor-text overflow-y-auto ${!visible ? 'hidden' : ''}`}
         onClick={handleContainerClick}
     >
         <div className="absolute top-24 right-4 text-xs text-zinc-300 dark:text-zinc-700 font-mono pointer-events-none opacity-0 group-hover:opacity-100 transition-opacity z-10">
@@ -49,4 +47,4 @@ const Editor: React.FC<EditorProps> = ({ content, onChange, visible, contentWidt
   );
 };
 
-export default Editor;
+export default React.memo(Editor);

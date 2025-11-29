@@ -1,5 +1,5 @@
 
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState, useEffect, useRef, useMemo } from 'react';
 import ReactMarkdown from 'react-markdown';
 import { Prism as SyntaxHighlighter } from 'react-syntax-highlighter';
 import { oneDark, oneLight } from 'react-syntax-highlighter/dist/esm/styles/prism';
@@ -96,6 +96,16 @@ const CodeBlock = ({ inline, className, children, theme, style, ...props }: any)
 
 const Preview: React.FC<PreviewProps> = ({ content, visible, contentWidth, theme, typography }) => {
   const containerRef = useRef<HTMLDivElement>(null);
+  const { baseSize, scales } = typography;
+
+  // Calculate max-width based on slider value (0-100)
+  const getMaxWidth = () => {
+    if (contentWidth >= 100) return '100%';
+    const minPx = 600;
+    const maxPx = 1400;
+    const calculated = minPx + (contentWidth / 99) * (maxPx - minPx);
+    return `${calculated}px`;
+  };
 
   // Setup Section Folding (DOM Manipulation)
   useEffect(() => {
@@ -180,43 +190,33 @@ const Preview: React.FC<PreviewProps> = ({ content, visible, contentWidth, theme
 
   }, [content, visible, typography]); // Re-run when content changes to attach listeners to new nodes
 
-  if (!visible) return null;
-
-  // Calculate max-width based on slider value (0-100)
-  const getMaxWidth = () => {
-    if (contentWidth >= 100) return '100%';
-    const minPx = 600;
-    const maxPx = 1400;
-    const calculated = minPx + (contentWidth / 99) * (maxPx - minPx);
-    return `${calculated}px`;
-  };
-
-  const { baseSize, scales } = typography;
+  // Memoize markdown components to prevent unnecessary re-renders of ReactMarkdown
+  const markdownComponents = useMemo(() => ({
+    h1: ({node, ...props}: any) => <h1 style={{ fontSize: `${baseSize * scales.h1}px` }} {...props} />,
+    h2: ({node, ...props}: any) => <h2 style={{ fontSize: `${baseSize * scales.h2}px` }} {...props} />,
+    h3: ({node, ...props}: any) => <h3 style={{ fontSize: `${baseSize * scales.h3}px` }} {...props} />,
+    h4: ({node, ...props}: any) => <h4 style={{ fontSize: `${baseSize * 1.25}px` }} {...props} />,
+    h5: ({node, ...props}: any) => <h5 style={{ fontSize: `${baseSize * 1.1}px` }} {...props} />,
+    h6: ({node, ...props}: any) => <h6 style={{ fontSize: `${baseSize}px` }} {...props} />,
+    p: ({node, ...props}: any) => <p style={{ fontSize: `${baseSize}px` }} {...props} />,
+    li: ({node, ...props}: any) => <li style={{ fontSize: `${baseSize}px` }} {...props} />,
+    code: (props: any) => <CodeBlock {...props} theme={theme} style={{ fontSize: `${baseSize * scales.code}px` }} />
+  }), [baseSize, scales, theme]);
 
   return (
-    <div className="h-full w-full overflow-y-auto px-6 sm:px-8 pt-24 pb-24 bg-white dark:bg-zinc-950 relative group scroll-smooth">
+    <div className={`h-full w-full overflow-y-auto px-6 sm:px-8 pt-24 pb-24 bg-white dark:bg-zinc-950 relative group scroll-smooth ${!visible ? 'hidden' : ''}`}>
         <div className="absolute top-24 right-4 text-xs text-zinc-300 dark:text-zinc-700 font-mono pointer-events-none opacity-0 group-hover:opacity-100 transition-opacity">
             PREVIEW
         </div>
       <div 
         ref={containerRef}
-        className="mx-auto transition-all duration-300 ease-in-out pl-8" // Added pl-8 to make room for folding icons
+        className="mx-auto transition-all duration-300 ease-in-out pl-8" 
         style={{ maxWidth: getMaxWidth(), width: '100%' }}
       >
         <article className="prose prose-zinc dark:prose-invert max-w-none prose-headings:font-bold prose-headings:scroll-mt-28 prose-a:text-zinc-900 dark:prose-a:text-zinc-100 prose-img:rounded-xl prose-pre:bg-transparent prose-pre:p-0 prose-pre:m-0">
             {content ? (
                 <ReactMarkdown
-                  components={{
-                    h1: ({node, ...props}) => <h1 style={{ fontSize: `${baseSize * scales.h1}px` }} {...props} />,
-                    h2: ({node, ...props}) => <h2 style={{ fontSize: `${baseSize * scales.h2}px` }} {...props} />,
-                    h3: ({node, ...props}) => <h3 style={{ fontSize: `${baseSize * scales.h3}px` }} {...props} />,
-                    h4: ({node, ...props}) => <h4 style={{ fontSize: `${baseSize * 1.25}px` }} {...props} />,
-                    h5: ({node, ...props}) => <h5 style={{ fontSize: `${baseSize * 1.1}px` }} {...props} />,
-                    h6: ({node, ...props}) => <h6 style={{ fontSize: `${baseSize}px` }} {...props} />,
-                    p: ({node, ...props}) => <p style={{ fontSize: `${baseSize}px` }} {...props} />,
-                    li: ({node, ...props}) => <li style={{ fontSize: `${baseSize}px` }} {...props} />,
-                    code: (props) => <CodeBlock {...props} theme={theme} style={{ fontSize: `${baseSize * scales.code}px` }} />
-                  }}
+                  components={markdownComponents}
                 >
                   {content}
                 </ReactMarkdown>
@@ -229,4 +229,6 @@ const Preview: React.FC<PreviewProps> = ({ content, visible, contentWidth, theme
   );
 };
 
-export default Preview;
+// Use React.memo to ensure Preview only re-renders when debounced content changes,
+// ignoring parent re-renders caused by rapid typing in Editor.
+export default React.memo(Preview);

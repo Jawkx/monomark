@@ -4,6 +4,7 @@ import Toolbar from './components/Toolbar';
 import Editor from './components/Editor';
 import Preview from './components/Preview';
 import useLocalStorage from './hooks/useLocalStorage';
+import useDebounce from './hooks/useDebounce';
 import { ViewMode, Theme, TypographyState } from './types';
 
 const INITIAL_MARKDOWN = `# Welcome to MonoMark
@@ -49,6 +50,9 @@ const App: React.FC = () => {
   const [typography, setTypography] = useLocalStorage<TypographyState>('monomark-typography', INITIAL_TYPOGRAPHY);
   const [toast, setToast] = useState<string | null>(null);
 
+  // Debounce content for heavy preview rendering (300ms)
+  const debouncedMarkdown = useDebounce(markdown, 300);
+
   // Apply Theme
   useEffect(() => {
     const root = window.document.documentElement;
@@ -87,34 +91,33 @@ const App: React.FC = () => {
     const isEdit = viewMode === ViewMode.EDIT;
     const isView = viewMode === ViewMode.VIEW;
 
+    // We render both components but toggle their visibility with CSS.
+    // This maintains internal state (scrolling, etc) and avoids unmount/remount lag.
+    
     return (
       <div className={`flex h-full w-full overflow-hidden relative ${isSplit ? 'flex-col md:flex-row divide-y md:divide-y-0 md:divide-x divide-zinc-100 dark:divide-zinc-900' : ''}`}>
         
         {/* Editor Pane */}
-        {(isEdit || isSplit) && (
-          <div className={`${isSplit ? 'h-1/2 md:h-full md:w-1/2' : 'w-full h-full'}`}>
+        <div className={`${isSplit ? 'h-1/2 md:h-full md:w-1/2' : 'w-full h-full'} ${(isEdit || isSplit) ? '' : 'hidden'}`}>
             <Editor 
               content={markdown} 
               onChange={setMarkdown} 
-              visible={true}
+              visible={isEdit || isSplit}
               contentWidth={contentWidth}
               baseSize={typography.baseSize}
             />
-          </div>
-        )}
+        </div>
 
-        {/* Preview Pane */}
-        {(isView || isSplit) && (
-          <div className={`${isSplit ? 'h-1/2 md:h-full md:w-1/2' : 'w-full h-full'}`}>
+        {/* Preview Pane - Uses debounced content for performance */}
+        <div className={`${isSplit ? 'h-1/2 md:h-full md:w-1/2' : 'w-full h-full'} ${(isView || isSplit) ? '' : 'hidden'}`}>
             <Preview 
-              content={markdown} 
-              visible={true} 
+              content={debouncedMarkdown} 
+              visible={isView || isSplit} 
               contentWidth={contentWidth}
               theme={theme}
               typography={typography}
             />
-          </div>
-        )}
+        </div>
       </div>
     );
   };
