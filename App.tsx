@@ -1,4 +1,3 @@
-
 import React, { useEffect, useState } from 'react';
 import Toolbar from './components/Toolbar';
 import Editor from './components/Editor';
@@ -52,6 +51,8 @@ const App: React.FC = () => {
 
   // Debounce content for heavy preview rendering (300ms)
   const debouncedMarkdown = useDebounce(markdown, 300);
+  // Debounce width changes to prevent layout thrashing during sliding (100ms)
+  const debouncedContentWidth = useDebounce(contentWidth, 100);
 
   // Apply Theme
   useEffect(() => {
@@ -103,17 +104,17 @@ const App: React.FC = () => {
               content={markdown} 
               onChange={setMarkdown} 
               visible={isEdit || isSplit}
-              contentWidth={contentWidth}
+              contentWidth={debouncedContentWidth}
               baseSize={typography.baseSize}
             />
         </div>
 
-        {/* Preview Pane - Uses debounced content for performance */}
+        {/* Preview Pane - Uses debounced content and width for performance */}
         <div className={`${isSplit ? 'h-1/2 md:h-full md:w-1/2' : 'w-full h-full'} ${(isView || isSplit) ? '' : 'hidden'}`}>
             <Preview 
               content={debouncedMarkdown} 
               visible={isView || isSplit} 
-              contentWidth={contentWidth}
+              contentWidth={debouncedContentWidth}
               theme={theme}
               typography={typography}
             />
