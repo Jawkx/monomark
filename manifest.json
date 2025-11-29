@@ -1,0 +1,21 @@
+{
+  "short_name": "MonoMark",
+  "name": "MonoMark Markdown Editor",
+  "icons": [
+    {
+      "src": "https://placehold.co/192x192/18181b/FFF.png?text=M",
+      "type": "image/png",
+      "sizes": "192x192"
+    },
+    {
+      "src": "https://placehold.co/512x512/18181b/FFF.png?text=M",
+      "type": "image/png",
+      "sizes": "512x512"
+    }
+  ],
+  "start_url": ".",
+  "display": "standalone",
+  "theme_color": "#ffffff",
+  "background_color": "#ffffff",
+  "orientation": "any"
+}
