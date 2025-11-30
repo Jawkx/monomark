@@ -7,6 +7,8 @@ export enum ViewMode {
 
 export type Theme = 'light' | 'dark';
 
+export type ThemePalette = 'zinc' | 'catppuccin' | 'nord' | 'solarized';
+
 export interface TypographyState {
   baseSize: number; // in pixels, e.g., 16
   scales: {
@@ -28,6 +30,8 @@ export interface ToolbarProps {
   setContentWidth: (width: number) => void;
   typography: TypographyState;
   setTypography: (state: TypographyState) => void;
+  palette: ThemePalette;
+  setPalette: (palette: ThemePalette) => void;
 }
 
 export interface EditorProps {

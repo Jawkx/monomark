@@ -3,8 +3,6 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
-    <meta name="theme-color" content="#ffffff" media="(prefers-color-scheme: light)">
-    <meta name="theme-color" content="#09090b" media="(prefers-color-scheme: dark)">
     <meta name="description" content="A minimal, dual-color Markdown editor with split-view and offline support.">
     <link rel="manifest" href="/manifest.json">
     <link rel="apple-touch-icon" href="https://placehold.co/192x192/18181b/FFF.png?text=M">
@@ -15,15 +13,24 @@
       (function() {
         try {
           var localTheme = localStorage.getItem('monomark-theme');
-          var theme = localTheme ? JSON.parse(localTheme) : null;
-          var supportDarkMode = window.matchMedia('(prefers-color-scheme: dark)').matches;
+          var localPalette = localStorage.getItem('monomark-palette');
           
-          // Apply dark class immediately if stored is dark, or if no storage and system is dark
-          if (theme === 'dark' || (!theme && supportDarkMode)) {
-            document.documentElement.classList.add('dark');
+          var theme = localTheme ? JSON.parse(localTheme) : null;
+          var palette = localPalette ? JSON.parse(localPalette) : 'zinc';
+
+          var supportDarkMode = window.matchMedia('(prefers-color-scheme: dark)').matches;
+          var isDark = theme === 'dark' || (!theme && supportDarkMode);
+
+          var root = document.documentElement;
+          if (isDark) {
+            root.classList.add('dark');
           } else {
-            document.documentElement.classList.remove('dark');
+            root.classList.remove('dark');
           }
+          
+          // Add palette class
+          root.classList.add('theme-' + palette);
+
         } catch (e) {
           console.error('Error applying theme:', e);
         }
@@ -37,20 +44,40 @@
         theme: {
           extend: {
             colors: {
-              accent: {
-                50: '#f0fdfa',
-                100: '#ccfbf1',
-                200: '#99f6e4',
-                300: '#5eead4',
-                400: '#2dd4bf',
-                500: '#14b8a6',
-                600: '#0d9488',
-                700: '#0f766e',
-                800: '#115e59',
-                900: '#134e4a',
-                950: '#042f2e',
-              }
+              // Semantic Colors mapped to CSS Variables
+              bg: {
+                primary: 'var(--bg-primary)',
+                secondary: 'var(--bg-secondary)',
+              },
+              fg: {
+                primary: 'var(--text-primary)',
+                secondary: 'var(--text-secondary)',
+              },
+              border: 'var(--border)',
+              accent: 'var(--accent)',
             },
+            typography: (theme) => ({
+              DEFAULT: {
+                css: {
+                  '--tw-prose-body': 'var(--text-primary)',
+                  '--tw-prose-headings': 'var(--text-primary)',
+                  '--tw-prose-lead': 'var(--text-secondary)',
+                  '--tw-prose-links': 'var(--text-primary)',
+                  '--tw-prose-bold': 'var(--text-primary)',
+                  '--tw-prose-counters': 'var(--text-secondary)',
+                  '--tw-prose-bullets': 'var(--border)',
+                  '--tw-prose-hr': 'var(--border)',
+                  '--tw-prose-quotes': 'var(--text-primary)',
+                  '--tw-prose-quote-borders': 'var(--border)',
+                  '--tw-prose-captions': 'var(--text-secondary)',
+                  '--tw-prose-code': 'var(--text-primary)',
+                  '--tw-prose-pre-code': 'var(--text-primary)',
+                  '--tw-prose-pre-bg': 'var(--bg-secondary)',
+                  '--tw-prose-th-borders': 'var(--border)',
+                  '--tw-prose-td-borders': 'var(--border)',
+                }
+              }
+            }),
             fontFamily: {
               mono: ['ui-monospace', 'SFMono-Regular', 'Menlo', 'Monaco', 'Consolas', "Liberation Mono", "Courier New", 'monospace'],
               sans: ['system-ui', '-apple-system', 'BlinkMacSystemFont', 'Segoe UI', 'Roboto', 'Helvetica Neue', 'Arial', 'sans-serif'],
@@ -74,23 +101,106 @@
       }
     </script>
     <style>
-      /* Base styles to match theme immediately */
+      /* CSS Variables for Theming */
+      :root {
+        /* Default transition for colors */
+        transition: background-color 0.2s ease, color 0.2s ease, border-color 0.2s ease;
+      }
+
+      /* 
+       * ZINC (Default) 
+       */
+      .theme-zinc {
+        --bg-primary: #ffffff;
+        --bg-secondary: #f4f4f5;
+        --text-primary: #18181b;
+        --text-secondary: #71717a;
+        --border: #e4e4e7;
+        --accent: #18181b;
+      }
+      .dark.theme-zinc {
+        --bg-primary: #09090b;
+        --bg-secondary: #18181b;
+        --text-primary: #f4f4f5;
+        --text-secondary: #a1a1aa;
+        --border: #27272a;
+        --accent: #f4f4f5;
+      }
+
+      /* 
+       * CATPPUCCIN 
+       * Latte (Light) / Mocha (Dark)
+       */
+      .theme-catppuccin {
+        --bg-primary: #eff1f5;
+        --bg-secondary: #e6e9ef;
+        --text-primary: #4c4f69;
+        --text-secondary: #6c6f85;
+        --border: #bcc0cc;
+        --accent: #1e66f5; /* Blue */
+      }
+      .dark.theme-catppuccin {
+        --bg-primary: #1e1e2e;
+        --bg-secondary: #181825;
+        --text-primary: #cdd6f4;
+        --text-secondary: #a6adc8;
+        --border: #313244;
+        --accent: #89b4fa; /* Blue */
+      }
+
+      /* 
+       * NORD 
+       * Snow Storm (Light) / Polar Night (Dark)
+       */
+      .theme-nord {
+        --bg-primary: #eceff4;
+        --bg-secondary: #e5e9f0;
+        --text-primary: #2e3440;
+        --text-secondary: #4c566a;
+        --border: #d8dee9;
+        --accent: #5e81ac;
+      }
+      .dark.theme-nord {
+        --bg-primary: #2e3440;
+        --bg-secondary: #3b4252;
+        --text-primary: #eceff4;
+        --text-secondary: #d8dee9;
+        --border: #434c5e;
+        --accent: #88c0d0;
+      }
+
+      /* 
+       * SOLARIZED
+       */
+      .theme-solarized {
+        --bg-primary: #fdf6e3;
+        --bg-secondary: #eee8d5;
+        --text-primary: #657b83;
+        --text-secondary: #93a1a1;
+        --border: #d3d7cf;
+        --accent: #2aa198;
+      }
+      .dark.theme-solarized {
+        --bg-primary: #002b36;
+        --bg-secondary: #073642;
+        --text-primary: #839496;
+        --text-secondary: #586e75;
+        --border: #073642;
+        --accent: #2aa198;
+      }
+
+
+      /* Base styles overrides */
       html, body {
-        background-color: #ffffff;
+        background-color: var(--bg-primary);
+        color: var(--text-primary);
         margin: 0;
         padding: 0;
         height: 100%;
         width: 100%;
       }
-      html.dark, html.dark body {
-        background-color: #09090b;
-        color: #f4f4f5;
-      }
       
-      /* 
-       * Splash Screen Styles (Pre-Tailwind) 
-       * These ensure the logo is visible while React and Tailwind are loading
-       */
+      /* Splash Screen Styles */
       .splash-container {
         height: 100vh;
         width: 100vw;
@@ -99,17 +209,18 @@
         align-items: center;
         justify-content: center;
         gap: 1rem;
+        background-color: #09090b; /* Force dark bg for splash to avoid flash on mobile */
       }
       
       .splash-logo {
         width: 64px;
         height: 64px;
         border-radius: 12px;
-        background-color: #18181b; /* Light mode: Zinc-900 */
+        background-color: #ffffff;
         display: flex;
         align-items: center;
         justify-content: center;
-        color: white;
+        color: #18181b;
         font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
         font-size: 32px;
         font-weight: bold;
@@ -120,20 +231,11 @@
         font-family: system-ui, -apple-system, sans-serif;
         font-size: 1.125rem;
         font-weight: 700;
-        color: #18181b;
+        color: #ffffff;
         letter-spacing: -0.025em;
       }
 
-      /* Dark mode overrides for splash */
-      .dark .splash-logo {
-        background-color: #ffffff;
-        color: #18181b;
-      }
-      .dark .splash-text {
-        color: #ffffff;
-      }
-      
-      /* Minimal scrollbar styling */
+      /* Scrollbar */
       ::-webkit-scrollbar {
         width: 8px;
         height: 8px;
@@ -142,17 +244,11 @@
         background: transparent;
       }
       ::-webkit-scrollbar-thumb {
-        background: #e4e4e7;
+        background: var(--border);
         border-radius: 4px;
       }
-      .dark ::-webkit-scrollbar-thumb {
-        background: #3f3f46;
-      }
       ::-webkit-scrollbar-thumb:hover {
-        background: #d4d4d8;
-      }
-      .dark ::-webkit-scrollbar-thumb:hover {
-        background: #52525b;
+        background: var(--text-secondary);
       }
     </style>
   <script type="importmap">
@@ -170,11 +266,10 @@
 }
 </script>
 </head>
-  <body class="bg-white dark:bg-zinc-950 text-zinc-900 dark:text-zinc-100 transition-colors duration-200 overscroll-none">
+  <body class="transition-colors duration-200 overscroll-none">
     <div id="root">
       <!-- 
         Initial Splash Screen 
-        This is rendered immediately by the browser and replaced by React once loaded.
       -->
       <div class="splash-container">
         <div class="splash-logo">M</div>

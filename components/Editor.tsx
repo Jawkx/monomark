@@ -1,4 +1,3 @@
-
 import React, { useRef } from 'react';
 import { EditorProps } from '../types';
 
@@ -25,7 +24,7 @@ const Editor: React.FC<EditorProps> = ({ content, onChange, visible, contentWidt
         className={`h-full w-full relative group cursor-text overflow-y-auto ${!visible ? 'hidden' : ''}`}
         onClick={handleContainerClick}
     >
-        <div className="absolute top-24 right-4 text-xs text-zinc-300 dark:text-zinc-700 font-mono pointer-events-none opacity-0 group-hover:opacity-100 transition-opacity z-10">
+        <div className="absolute top-24 right-4 text-xs text-fg-secondary font-mono pointer-events-none opacity-0 group-hover:opacity-100 transition-opacity z-10">
             EDITOR
         </div>
         
@@ -35,7 +34,7 @@ const Editor: React.FC<EditorProps> = ({ content, onChange, visible, contentWidt
         >
             <textarea
                 ref={textareaRef}
-                className="w-full h-full min-h-[calc(100vh-12rem)] resize-none bg-transparent px-6 sm:px-8 outline-none border-none text-zinc-800 dark:text-zinc-300 font-mono leading-relaxed placeholder-zinc-300 dark:placeholder-zinc-700 block"
+                className="w-full h-full min-h-[calc(100vh-12rem)] resize-none bg-transparent px-6 sm:px-8 outline-none border-none text-fg-primary font-mono leading-relaxed placeholder-fg-secondary block"
                 style={{ fontSize: `${baseSize}px` }}
                 value={content}
                 onChange={(e) => onChange(e.target.value)}

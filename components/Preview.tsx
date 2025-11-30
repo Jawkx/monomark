@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect, useRef, useMemo } from 'react';
 import ReactMarkdown from 'react-markdown';
 import { Prism as SyntaxHighlighter } from 'react-syntax-highlighter';
@@ -21,26 +20,26 @@ const CodeBlock = ({ inline, className, children, theme, style, ...props }: any)
   if (!inline && match) {
     const language = match[1];
     return (
-      <div className="rounded-xl overflow-hidden my-6 border border-zinc-200 dark:border-zinc-800 bg-zinc-50 dark:bg-[#282c34]/50" style={style}>
+      <div className="rounded-xl overflow-hidden my-6 border border-border bg-bg-secondary" style={style}>
         {/* Code Header Bar */}
         <div 
-            className="flex items-center justify-between px-3 py-2 bg-zinc-100 dark:bg-zinc-800/50 border-b border-zinc-200 dark:border-zinc-800 cursor-pointer select-none"
+            className="flex items-center justify-between px-3 py-2 bg-bg-primary/50 border-b border-border cursor-pointer select-none"
             onClick={() => setIsCollapsed(!isCollapsed)}
         >
             <div className="flex items-center gap-2">
                 <button 
-                    className="text-zinc-400 hover:text-zinc-600 dark:text-zinc-500 dark:hover:text-zinc-300 transition-colors"
+                    className="text-fg-secondary hover:text-fg-primary transition-colors"
                 >
                     {isCollapsed ? <ChevronRight size={14} /> : <ChevronDown size={14} />}
                 </button>
-                <span className="text-xs font-mono font-medium text-zinc-500 dark:text-zinc-400 uppercase tracking-wider">
+                <span className="text-xs font-mono font-medium text-fg-secondary uppercase tracking-wider">
                     {language}
                 </span>
             </div>
             
             <button
                 onClick={handleCopy}
-                className="flex items-center gap-1.5 px-2 py-1 rounded hover:bg-zinc-200 dark:hover:bg-zinc-700 transition-colors text-xs font-medium text-zinc-500 dark:text-zinc-400"
+                className="flex items-center gap-1.5 px-2 py-1 rounded hover:bg-bg-primary transition-colors text-xs font-medium text-fg-secondary"
                 title="Copy code"
             >
                 {copied ? (
@@ -79,8 +78,7 @@ const CodeBlock = ({ inline, className, children, theme, style, ...props }: any)
                 >
                     {String(children).replace(/\n$/, '')}
                 </SyntaxHighlighter>
-                {/* Background layer */}
-                <div className="absolute inset-0 -z-10 bg-white dark:bg-[#282c34]"></div>
+                {/* Background layer to match theme opacity if needed, but handled by parent bg-bg-secondary */}
             </div>
         )}
       </div>
@@ -88,7 +86,7 @@ const CodeBlock = ({ inline, className, children, theme, style, ...props }: any)
   }
 
   return (
-    <code className={`${className} bg-zinc-100 dark:bg-zinc-800 px-1.5 py-0.5 rounded text-zinc-800 dark:text-zinc-200 font-mono text-[0.9em]`} style={style} {...props}>
+    <code className={`${className} bg-bg-secondary px-1.5 py-0.5 rounded text-fg-primary font-mono text-[0.9em]`} style={style} {...props}>
       {children}
     </code>
   );
@@ -118,7 +116,7 @@ const Preview: React.FC<PreviewProps> = ({ content, visible, contentWidth, theme
     // Helper to create the chevron icon
     const createChevron = (isFolded: boolean) => {
         const span = document.createElement('span');
-        span.className = 'folding-icon inline-flex items-center justify-center w-6 h-6 -ml-8 mr-2 text-zinc-300 dark:text-zinc-600 hover:text-zinc-900 dark:hover:text-zinc-100 transition-colors cursor-pointer rounded-md';
+        span.className = 'folding-icon inline-flex items-center justify-center w-6 h-6 -ml-8 mr-2 text-fg-secondary hover:text-fg-primary transition-colors cursor-pointer rounded-md';
         span.innerHTML = `<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="transform transition-transform duration-200 ${isFolded ? '-rotate-90' : 'rotate-0'}"><polyline points="6 9 12 15 18 9"></polyline></svg>`;
         return span;
     };
@@ -204,8 +202,8 @@ const Preview: React.FC<PreviewProps> = ({ content, visible, contentWidth, theme
   }), [baseSize, scales, theme]);
 
   return (
-    <div className={`h-full w-full overflow-y-auto px-6 sm:px-8 pt-24 pb-24 bg-white dark:bg-zinc-950 relative group scroll-smooth ${!visible ? 'hidden' : ''}`}>
-        <div className="absolute top-24 right-4 text-xs text-zinc-300 dark:text-zinc-700 font-mono pointer-events-none opacity-0 group-hover:opacity-100 transition-opacity">
+    <div className={`h-full w-full overflow-y-auto px-6 sm:px-8 pt-24 pb-24 bg-bg-primary relative group scroll-smooth ${!visible ? 'hidden' : ''}`}>
+        <div className="absolute top-24 right-4 text-xs text-fg-secondary font-mono pointer-events-none opacity-0 group-hover:opacity-100 transition-opacity">
             PREVIEW
         </div>
       <div 
@@ -213,7 +211,7 @@ const Preview: React.FC<PreviewProps> = ({ content, visible, contentWidth, theme
         className="mx-auto transition-all duration-300 ease-in-out pl-8" 
         style={{ maxWidth: getMaxWidth(), width: '100%' }}
       >
-        <article className="prose prose-zinc dark:prose-invert max-w-none prose-headings:font-bold prose-headings:scroll-mt-28 prose-a:text-zinc-900 dark:prose-a:text-zinc-100 prose-img:rounded-xl prose-pre:bg-transparent prose-pre:p-0 prose-pre:m-0">
+        <article className="prose prose-zinc dark:prose-invert max-w-none prose-headings:font-bold prose-headings:scroll-mt-28 prose-a:text-accent prose-img:rounded-xl prose-pre:bg-transparent prose-pre:p-0 prose-pre:m-0">
             {content ? (
                 <ReactMarkdown
                   components={markdownComponents}
@@ -221,7 +219,7 @@ const Preview: React.FC<PreviewProps> = ({ content, visible, contentWidth, theme
                   {content}
                 </ReactMarkdown>
             ) : (
-                <p className="text-zinc-400 dark:text-zinc-600 italic" style={{ fontSize: `${baseSize}px` }}>Nothing to preview yet...</p>
+                <p className="text-fg-secondary italic" style={{ fontSize: `${baseSize}px` }}>Nothing to preview yet...</p>
             )}
         </article>
       </div>
@@ -229,6 +227,4 @@ const Preview: React.FC<PreviewProps> = ({ content, visible, contentWidth, theme
   );
 };
 
-// Use React.memo to ensure Preview only re-renders when debounced content changes,
-// ignoring parent re-renders caused by rapid typing in Editor.
 export default React.memo(Preview);
