@@ -4,14 +4,25 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
     <meta name="description" content="A minimal, dual-color Markdown editor with split-view and offline support.">
+    <!-- Default theme color, updated by JS -->
+    <meta name="theme-color" content="#ffffff">
+    
     <link rel="manifest" href="/manifest.json">
     <link rel="apple-touch-icon" href="https://placehold.co/192x192/18181b/FFF.png?text=M">
     <title>MonoMark</title>
     
-    <!-- CRITICAL: Prevent Dark Mode Flash -->
+    <!-- CRITICAL: Prevent Dark Mode Flash and Set PWA Theme Color -->
     <script>
       (function() {
         try {
+          // Color Definitions (Must match CSS)
+          var colors = {
+            zinc: { light: '#ffffff', dark: '#09090b' },
+            catppuccin: { light: '#eff1f5', dark: '#1e1e2e' },
+            nord: { light: '#eceff4', dark: '#2e3440' },
+            solarized: { light: '#fdf6e3', dark: '#002b36' }
+          };
+
           var localTheme = localStorage.getItem('monomark-theme');
           var localPalette = localStorage.getItem('monomark-palette');
           
@@ -30,6 +41,13 @@
           
           // Add palette class
           root.classList.add('theme-' + palette);
+
+          // Update PWA Theme Color
+          var metaThemeColor = document.querySelector('meta[name="theme-color"]');
+          if (metaThemeColor) {
+             var colorSet = colors[palette] || colors.zinc;
+             metaThemeColor.setAttribute('content', isDark ? colorSet.dark : colorSet.light);
+          }
 
         } catch (e) {
           console.error('Error applying theme:', e);

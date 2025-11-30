@@ -40,6 +40,14 @@ const INITIAL_TYPOGRAPHY: TypographyState = {
   }
 };
 
+// Map of theme background colors for PWA status bar
+const THEME_COLORS: Record<ThemePalette, { light: string; dark: string }> = {
+  zinc: { light: '#ffffff', dark: '#09090b' },
+  catppuccin: { light: '#eff1f5', dark: '#1e1e2e' },
+  nord: { light: '#eceff4', dark: '#2e3440' },
+  solarized: { light: '#fdf6e3', dark: '#002b36' }
+};
+
 const App: React.FC = () => {
   // State
   const [markdown, setMarkdown] = useLocalStorage<string>('monomark-content', INITIAL_MARKDOWN);
@@ -75,6 +83,13 @@ const App: React.FC = () => {
     });
     // Add new palette
     root.classList.add(`theme-${palette}`);
+
+    // Update PWA Theme Color (Status Bar)
+    const metaThemeColor = document.querySelector('meta[name="theme-color"]');
+    if (metaThemeColor) {
+      const color = theme === 'dark' ? THEME_COLORS[palette].dark : THEME_COLORS[palette].light;
+      metaThemeColor.setAttribute('content', color);
+    }
     
   }, [theme, palette]);
 
