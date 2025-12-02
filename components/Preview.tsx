@@ -3,6 +3,8 @@ import ReactMarkdown from 'react-markdown';
 import { Prism as SyntaxHighlighter } from 'react-syntax-highlighter';
 import { oneDark, oneLight } from 'react-syntax-highlighter/dist/esm/styles/prism';
 import { Copy, Check, ChevronDown, ChevronRight } from 'lucide-react';
+import remarkGfm from 'remark-gfm';
+import rehypeRaw from 'rehype-raw';
 import { PreviewProps } from '../types';
 
 const CodeBlock = ({ inline, className, children, theme, style, ...props }: any) => {
@@ -198,7 +200,32 @@ const Preview: React.FC<PreviewProps> = ({ content, visible, contentWidth, theme
     h6: ({node, ...props}: any) => <h6 style={{ fontSize: `${baseSize}px` }} {...props} />,
     p: ({node, ...props}: any) => <p style={{ fontSize: `${baseSize}px` }} {...props} />,
     li: ({node, ...props}: any) => <li style={{ fontSize: `${baseSize}px` }} {...props} />,
-    code: (props: any) => <CodeBlock {...props} theme={theme} style={{ fontSize: `${baseSize * scales.code}px` }} />
+    code: (props: any) => <CodeBlock {...props} theme={theme} style={{ fontSize: `${baseSize * scales.code}px` }} />,
+    
+    // Custom Table Rendering
+    table: ({node, ...props}: any) => (
+      <div className="overflow-x-auto my-6 border border-border rounded-lg">
+        <table className="w-full text-left border-collapse min-w-max" style={{ fontSize: `${baseSize}px` }} {...props} />
+      </div>
+    ),
+    thead: ({node, ...props}: any) => <thead className="bg-bg-secondary/50 text-fg-primary" {...props} />,
+    th: ({node, ...props}: any) => <th className="p-3 font-semibold border-b border-r border-border last:border-r-0" {...props} />,
+    td: ({node, ...props}: any) => <td className="p-3 border-b border-r border-border last:border-r-0 last:border-b-0" {...props} />,
+    
+    // Custom Details/Summary Rendering
+    details: ({node, ...props}: any) => (
+      <details 
+        className="group border border-border rounded-lg bg-bg-secondary/20 my-4 overflow-hidden" 
+        style={{ fontSize: `${baseSize}px` }} 
+        {...props} 
+      />
+    ),
+    summary: ({node, ...props}: any) => (
+      <summary 
+        className="cursor-pointer p-3 font-medium bg-bg-secondary/40 text-fg-primary hover:bg-bg-secondary/60 transition-colors outline-none list-none select-none flex items-center gap-2" 
+        {...props} 
+      />
+    ),
   }), [baseSize, scales, theme]);
 
   return (
@@ -214,6 +241,8 @@ const Preview: React.FC<PreviewProps> = ({ content, visible, contentWidth, theme
         <article className="prose prose-zinc dark:prose-invert max-w-none prose-headings:font-bold prose-headings:scroll-mt-28 prose-a:text-accent prose-img:rounded-xl prose-pre:bg-transparent prose-pre:p-0 prose-pre:m-0">
             {content ? (
                 <ReactMarkdown
+                  remarkPlugins={[remarkGfm]}
+                  rehypePlugins={[rehypeRaw]}
                   components={markdownComponents}
                 >
                   {content}

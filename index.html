@@ -26,8 +26,9 @@
           var localTheme = localStorage.getItem('monomark-theme');
           var localPalette = localStorage.getItem('monomark-palette');
           
-          var theme = localTheme ? JSON.parse(localTheme) : null;
-          var palette = localPalette ? JSON.parse(localPalette) : 'zinc';
+          // Safety check for 'undefined' string which can break JSON.parse
+          var theme = (localTheme && localTheme !== 'undefined') ? JSON.parse(localTheme) : null;
+          var palette = (localPalette && localPalette !== 'undefined') ? JSON.parse(localPalette) : 'zinc';
 
           var supportDarkMode = window.matchMedia('(prefers-color-scheme: dark)').matches;
           var isDark = theme === 'dark' || (!theme && supportDarkMode);
@@ -278,8 +279,10 @@
     "react/": "https://aistudiocdn.com/react@^19.2.0/",
     "react": "https://aistudiocdn.com/react@^19.2.0",
     "react-syntax-highlighter": "https://aistudiocdn.com/react-syntax-highlighter@^15.5.0",
-    "react-syntax-highlighter/dist/esm/styles/prism": "https://aistudiocdn.com/react-syntax-highlighter@^15.5.0/dist/esm/styles/prism",
-    "react-syntax-highlighter/": "https://aistudiocdn.com/react-syntax-highlighter@^16.1.0/"
+    "react-syntax-highlighter/dist/esm/styles/prism": "https://aistudiocdn.com/react-syntax-highlighter@^15.5.0/dist/esm/styles/prism/index.js",
+    "react-syntax-highlighter/": "https://aistudiocdn.com/react-syntax-highlighter@^15.5.0/",
+    "remark-gfm": "https://aistudiocdn.com/remark-gfm@^4.0.0",
+    "rehype-raw": "https://aistudiocdn.com/rehype-raw@^7.0.0"
   }
 }
 </script>
