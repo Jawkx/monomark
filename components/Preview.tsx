@@ -209,8 +209,8 @@ const Preview: React.FC<PreviewProps> = ({ content, visible, contentWidth, theme
       </div>
     ),
     thead: ({node, ...props}: any) => <thead className="bg-bg-secondary/50 text-fg-primary" {...props} />,
-    th: ({node, ...props}: any) => <th className="p-3 font-semibold border-b border-r border-border last:border-r-0" {...props} />,
-    td: ({node, ...props}: any) => <td className="p-3 border-b border-r border-border last:border-r-0 last:border-b-0" {...props} />,
+    th: ({node, ...props}: any) => <th className="p-3 font-semibold border-b border-r border-border last:border-r-0 text-fg-primary" {...props} />,
+    td: ({node, ...props}: any) => <td className="p-3 border-b border-r border-border last:border-r-0 last:border-b-0 text-fg-primary" {...props} />,
     
     // Custom Details/Summary Rendering
     details: ({node, ...props}: any) => (
@@ -238,7 +238,7 @@ const Preview: React.FC<PreviewProps> = ({ content, visible, contentWidth, theme
         className="mx-auto transition-all duration-300 ease-in-out pl-8" 
         style={{ maxWidth: getMaxWidth(), width: '100%' }}
       >
-        <article className="prose prose-zinc dark:prose-invert max-w-none prose-headings:font-bold prose-headings:scroll-mt-28 prose-a:text-accent prose-img:rounded-xl prose-pre:bg-transparent prose-pre:p-0 prose-pre:m-0">
+        <article className="prose max-w-none prose-headings:font-bold prose-headings:scroll-mt-28 prose-a:text-accent prose-img:rounded-xl prose-pre:bg-transparent prose-pre:p-0 prose-pre:m-0 text-fg-primary">
             {content ? (
                 <ReactMarkdown
                   remarkPlugins={[remarkGfm]}
